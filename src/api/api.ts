@@ -1,12 +1,12 @@
 import { ShareGPTSubmitBodyInterface } from '@type/api';
 import { ConfigInterface, MessageInterface } from '@type/chat';
 import { supabase } from '@utils/supabaseClient';
-// Environment variables - remember to define in Vercel
-const endpoint =
-  `${import.meta.env.VITE_OPENAI_BASE_URL}/v1/chat/completions` ??
-  'https://api.openai.com/v1/chat/completions';
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
+// API endpoint и ключ
+const endpoint = 'https://api.naga.ac/v1/chat/completions';
+const apiKey = 'LMx_n6HZCGzRHfTDynXD3cnpLAeH1GEEyMiQwv6iGmU';
 const client = supabase;
+
 export const getChatCompletion = async (
   messages: MessageInterface[],
   config: ConfigInterface,
@@ -16,7 +16,9 @@ export const getChatCompletion = async (
     'Content-Type': 'application/json',
     ...customHeaders,
   };
+  
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+  
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -32,6 +34,7 @@ export const getChatCompletion = async (
     }),
     mode: 'cors',
   });
+
   // Error handling (catch-all)
   if (!response.ok) throw new Error(await response.json());
 
@@ -48,7 +51,9 @@ export const getChatCompletionStream = async (
     'Content-Type': 'application/json',
     ...customHeaders,
   };
+
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
+
   const response = await fetch(endpoint, {
     method: 'POST',
     headers,
@@ -65,14 +70,17 @@ export const getChatCompletionStream = async (
   if (!response.ok) {
     const responseText = await response.text();
     let message = '';
+
     try {
       const parsedResponse = JSON.parse(responseText);
       message = JSON.stringify(parsedResponse);
     } catch (error) {
       message = responseText;
     }
+
     throw new Error(message);
   }
+
   const stream = response.body;
   return stream;
 };
